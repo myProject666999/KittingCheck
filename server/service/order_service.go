@@ -79,7 +79,7 @@ func (s *OrderService) GetByID(id uint) (*model.SalesOrder, error) {
 	return s.repo.GetByID(id)
 }
 
-func (s *OrderService) UpdateStatus(id uint, req *model.UpdateOrderStatusRequest) error {
+func (s *OrderService) UpdateStatus(id uint, req *model.UpdateOrderStatusRequest) (*model.SalesOrder, error) {
 	validStatuses := map[string]bool{
 		"pending":  true,
 		"kitting":  true,
@@ -88,9 +88,12 @@ func (s *OrderService) UpdateStatus(id uint, req *model.UpdateOrderStatusRequest
 		"shipped":  true,
 	}
 	if !validStatuses[req.Status] {
-		return errors.New("invalid status")
+		return nil, errors.New("invalid status")
 	}
-	return s.repo.UpdateStatus(id, req.Status)
+	if err := s.repo.UpdateStatus(id, req.Status); err != nil {
+		return nil, err
+	}
+	return s.repo.GetByID(id)
 }
 
 func (s *OrderService) ListByStatusesPaginated(statuses []string, page, pageSize int, sort string) ([]model.SalesOrder, int64, error) {

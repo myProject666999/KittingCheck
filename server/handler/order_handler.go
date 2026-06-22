@@ -75,9 +75,10 @@ func (h *OrderHandler) UpdateStatus(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid request body"})
 	}
 
-	if err := h.svc.UpdateStatus(uint(id), &req); err != nil {
+	order, err := h.svc.UpdateStatus(uint(id), &req)
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, echo.Map{"message": "status updated"})
+	return c.JSON(http.StatusOK, order)
 }
